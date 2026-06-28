@@ -1,0 +1,76 @@
+"""
+Car Class Module
+----------------
+This file defines the Car class using Object-Oriented Programming (OOP).
+
+Each car object represents a real-world vehicle with:
+- basic properties (model, year, colour)
+- state (fuel, usage)
+- behavior (assign driver, fuel check, etc.)
+"""
+
+class Car:
+    def __init__(self, model: str, year: int, colour: str,
+                 is_electric: bool, fuel_level: int, mileage: str):
+        """
+        Initialize a new Car object.
+
+        Args:
+            model (str): Name of the car
+            year (int): Manufacturing year
+            colour (str): Car colour
+            is_electric (bool): Electric or petrol/diesel
+            fuel_level (int): Fuel level (0–10 scale)
+            mileage (str): Mileage rating ("Good", "Decent", "Bad")
+        """
+        self.model = model
+        self.year = year
+        self.colour = colour
+        self.is_electric = is_electric
+        self.fuel_level = fuel_level
+        self.mileage = mileage
+
+        # Runtime state
+        self.in_use = False
+        self.driver = None
+
+    # -------------------------------
+    # DRIVER MANAGEMENT
+    # -------------------------------
+    def assign_driver(self, driver_name: str):
+        """Assign a driver to this car."""
+        self.driver = driver_name
+        self.in_use = True
+
+    def release_driver(self):
+        """Free the car after mission."""
+        self.driver = None
+        self.in_use = False
+
+    # -------------------------------
+    # STATUS METHODS
+    # -------------------------------
+    def driving_status(self) -> str:
+        """Return availability status."""
+        if self.in_use:
+            return f"{self.model} is being used by {self.driver}"
+        return f"{self.model} is available"
+
+    def fuel_status(self) -> str:
+        """Check fuel or battery condition."""
+        if self.is_electric:
+            return f"{self.model} is electric ⚡"
+
+        if self.fuel_level <= 3:
+            return f"{self.model} needs fuel ⛽"
+        return f"{self.model} has enough fuel"
+
+    def mileage_status(self) -> str:
+        """Return mileage quality."""
+        return f"{self.model} mileage is {self.mileage}"
+
+    # -------------------------------
+    # STRING REPRESENTATION
+    # -------------------------------
+    def __str__(self):
+        return f"{self.model} ({self.year}) - {self.colour}"
