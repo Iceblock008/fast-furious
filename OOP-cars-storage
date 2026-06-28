@@ -1,0 +1,75 @@
+"""
+Car Storage Module
+------------------
+Acts as a mini database of cars.
+
+Responsibilities:
+- Store all car objects
+- Provide available cars
+- Assign best car based on skill
+"""
+
+from unit_1_oop_cars import Car
+
+# -------------------------------
+# CAR DATABASE
+# -------------------------------
+cars = [
+    Car("Nissan GTR", 2024, "red", False, 8, "Bad"),
+    Car("Porsche 911", 2023, "silver", False, 7, "Decent"),
+    Car("Tesla Model S", 2024, "white", True, 10, "Good"),
+    Car("Ford Mustang", 1969, "black", False, 5, "Bad"),
+    Car("Toyota Supra", 2022, "orange", False, 6, "Good"),
+    Car("BMW M4", 2024, "yellow", False, 9, "Decent"),
+    Car("Audi e-tron", 2023, "gray", True, 10, "Good"),
+    Car("Ferrari Roma", 2024, "red", False, 9, "Bad"),
+    Car("Jeep Wrangler", 2021, "green", False, 6, "Decent"),
+    Car("Dodge Charger", 2023, "black", False, 8, "Bad"),
+    Car("Bugatti Chiron", 2024, "blue", False, 10, "Bad"),
+]
+
+# -------------------------------
+# HELPER FUNCTIONS
+# -------------------------------
+def get_available_cars():
+    """Return all cars that are not currently in use."""
+    return [car for car in cars if not car.in_use]
+
+
+def assign_car_to_driver(driver_name: str, skill: str):
+    """
+    Assign the best available car based on skill.
+
+    Logic:
+    - Driving → highest fuel
+    - Stealth → dark colored cars
+    - Tech → electric cars
+    """
+
+    available_cars = get_available_cars()
+
+    if not available_cars:
+        return None
+
+    # Skill-based selection
+    if skill == "driving":
+        best_car = max(available_cars, key=lambda car: car.fuel_level)
+
+    elif skill == "stealth":
+        best_car = next(
+            (car for car in available_cars if car.colour in ["black", "gray"]),
+            available_cars[0]
+        )
+
+    elif skill in ["tech", "hacking"]:
+        best_car = next(
+            (car for car in available_cars if car.is_electric),
+            available_cars[0]
+        )
+
+    else:
+        best_car = available_cars[0]
+
+    # Assign driver
+    best_car.assign_driver(driver_name)
+    return best_car
