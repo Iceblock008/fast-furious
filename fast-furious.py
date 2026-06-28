@@ -1,76 +1,129 @@
 """
-Car Class Module
-----------------
-This file defines the Car class using Object-Oriented Programming (OOP).
+Fast & Furious Mission Planner
+------------------------------
+This file acts as the main system.
 
-Each car object represents a real-world vehicle with:
-- basic properties (model, year, colour)
-- state (fuel, usage)
-- behavior (assign driver, fuel check, etc.)
+Responsibilities:
+- Analyze mission description
+- Select best crew members
+- Assign cars to each member
 """
 
-class Car:
-    def __init__(self, model: str, year: int, colour: str,
-                 is_electric: bool, fuel_level: int, mileage: str):
-        """
-        Initialize a new Car object.
+from unit_1_oop_cars_storage_data import assign_car_to_driver
 
-        Args:
-            model (str): Name of the car
-            year (int): Manufacturing year
-            colour (str): Car colour
-            is_electric (bool): Electric or petrol/diesel
-            fuel_level (int): Fuel level (0–10 scale)
-            mileage (str): Mileage rating ("Good", "Decent", "Bad")
-        """
-        self.model = model
-        self.year = year
-        self.colour = colour
-        self.is_electric = is_electric
-        self.fuel_level = fuel_level
-        self.mileage = mileage
+# -------------------------------
+# CREW DATABASE
+# -------------------------------
+crew_database = {
+    "Dominic Toretto": {"skills": ["driving", "muscle"], "power": 10},
+    "Brian O'Conner": {"skills": ["driving", "stealth"], "power": 10},
+    "Letty Ortiz": {"skills": ["driving", "combat"], "power": 8},
+    "Roman Pearce": {"skills": ["distraction"], "power": 7},
+    "Tej Parker": {"skills": ["tech", "hacking"], "power": 8},
+    "Han Lue": {"skills": ["stealth", "driving"], "power": 9},
+    "Luke Hobbs": {"skills": ["muscle", "combat"], "power": 10},
+    "Deckard Shaw": {"skills": ["combat", "stealth"], "power": 10},
+    "Ramsey": {"skills": ["hacking", "tech"], "power": 8.5},
+}
 
-        # Runtime state
-        self.in_use = False
-        self.driver = None
+# -------------------------------
+# SKILL DETECTION
+# -------------------------------
+def analyze_mission_description(description: str):
+    """
+    Extract required skills from mission description.
+    """
+    desc = description.lower()
+    skills = []
 
-    # -------------------------------
-    # DRIVER MANAGEMENT
-    # -------------------------------
-    def assign_driver(self, driver_name: str):
-        """Assign a driver to this car."""
-        self.driver = driver_name
-        self.in_use = True
+    if "hack" in desc:
+        skills.append("hacking")
+    if "drive" in desc or "car" in desc or "race" in desc:
+        skills.append("driving")
+    if "fight" in desc or "combat" in desc:
+        skills.append("combat")
+    if "sneak" in desc or "stealth" in desc:
+        skills.append("stealth")
+    if "tech" in desc:
+        skills.append("tech")
 
-    def release_driver(self):
-        """Free the car after mission."""
-        self.driver = None
-        self.in_use = False
+    return skills if skills else ["driving"]
 
-    # -------------------------------
-    # STATUS METHODS
-    # -------------------------------
-    def driving_status(self) -> str:
-        """Return availability status."""
-        if self.in_use:
-            return f"{self.model} is being used by {self.driver}"
-        return f"{self.model} is available"
 
-    def fuel_status(self) -> str:
-        """Check fuel or battery condition."""
-        if self.is_electric:
-            return f"{self.model} is electric ⚡"
+# -------------------------------
+# CREW SELECTION
+# -------------------------------
+def select_crew(required_skills):
+    """
+    Select best crew members based on skills and power.
+    """
+    selected = []
 
-        if self.fuel_level <= 3:
-            return f"{self.model} needs fuel ⛽"
-        return f"{self.model} has enough fuel"
+    for skill in required_skills:
+        best_candidate = None
+        highest_power = -1
 
-    def mileage_status(self) -> str:
-        """Return mileage quality."""
-        return f"{self.model} mileage is {self.mileage}"
+        for name, data in crew_database.items():
+            if skill in data["skills"] and name not in selected:
+                if data["power"] > highest_power:
+                    best_candidate = name
+                    highest_power = data["power"]
 
-    # -------------------------------
-    # STRING REPRESENTATION
-    # -------------------------------
-    def __str__(self):
-        return f"{self.model} ({self.year}) - {self.colour}"
+        if best_candidate:
+            selected.append(best_candidate)
+
+    return selected
+
+
+# -------------------------------
+# MISSION EXECUTION
+# -------------------------------
+def run_mission_planner(title: str, description: str, difficulty: str):
+    """
+    Main function to run mission planning.
+    """
+    required_skills = analyze_mission_description(description)
+    crew = select_crew(required_skills)
+
+    print("\n" + "=" * 50)
+    print(f"MISSION: {title}")
+    print(f"Difficulty Level: {difficulty}")
+    print(f"Required Skills: {required_skills}")
+    print("=" * 50)
+
+    print("\nCREW + CAR ASSIGNMENT:\n")
+
+    for member in crew:
+        primary_skill = crew_database[member]["skills"][0]
+
+        # Assign car
+        car = assign_car_to_driver(member, primary_skill)
+
+        if car:
+            print(f"{member} → {primary_skill.upper()} → {car.model}")
+        else:
+            print(f"{member} → No car available")
+
+    print("\nMission Ready 🚀\n")
+
+
+# -------------------------------
+# MAIN LOOP (CLI)
+# -------------------------------
+def main():
+    print("🏎️ Fast & Furious Mission System")
+    print("Type 'exit' to quit\n")
+
+    while True:
+        title = input("Mission Name: ").strip()
+        if title.lower() == "exit":
+            break
+
+        description = input("Describe Mission: ").strip()
+        difficulty = input("Difficulty (1-3): ").strip()
+
+        run_mission_planner(title, description, difficulty)
+
+
+if __name__ == "__main__":
+    main()
